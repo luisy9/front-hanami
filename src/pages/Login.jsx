@@ -1,0 +1,90 @@
+import { useState, useContext, useEffect } from "react"
+import ClienteContext from "../context/ClienteContext";
+
+// constantes 
+const URL = 'http://localhost:3000/api'
+
+export const Login = () => {
+    const [inputs, setInputs] = useState({ email: '', password: '' })
+
+    // contexto para ver si está logueado un cliente o no
+    const { log, setLog } = useContext(ClienteContext)
+
+    // funciones 
+    const handleInputs = (event) => {
+        const { name, value } = event.target
+        setInputs({
+            ...inputs,
+            [name]: value
+        })
+    }
+
+    const handleSubmit = (event) => {
+        event.preventDefault()
+        // fetch para enviar datos
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(inputs),
+            credentials: 'include'
+        }
+        fetch(URL + '/clientes/login', options)
+            .then(res => res.json())
+            .then(res => {
+                console.log(res)
+                console.log('log')
+                console.log(log)
+                
+                setLog(res)
+            })
+            .catch(err => {
+                console.log(err)
+            })
+        // limpiar inputs
+        setInputs({ email: '', password: '' })
+    }
+
+
+    useEffect(() => {
+        console.log(log)
+    }, [log])
+
+    return (
+        <div className=" w-11/12 mx-auto border border-gray-900 mt-40
+        lg:flex lg:h-dvh lg:w-full lg:m-0 lg:border-none">
+            <div className="flex flex-col px-7 py-4
+            lg:w-1/2 lg:mt-60" >
+                <form onSubmit={handleSubmit} className="flex flex-col w-full gap-4">
+                    <label
+                        className="">Email</label>
+                    <input
+                        className="border border-gray-900"
+                        type="email"
+                        name="email"
+                        value={inputs.email}
+                        onChange={handleInputs}
+                    ></input>
+                    <label
+                        className="">Password</label>
+                    <input
+                        className="border border-gray-900"
+                        type="password"
+                        name="password"
+                        value={inputs.password}
+                        onChange={handleInputs}
+                    ></input>
+
+                    <button
+                        className="">Enviar</button>
+                </form>
+            </div>
+
+            <div className="hidden 
+            lg:block lg:w-1/2  lg:bg-sky-800" ></div>
+        </div>
+    )
+}
+
+export default Login;
